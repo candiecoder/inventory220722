@@ -13,3 +13,6 @@ Edit the variable assignments in the top-level code block to adapt for your spre
 
 ### Run the solution
 Press the `Ctrl`+`G` keyboard shortcut (or run the `ProcessNewScans` macro via the Excel UI). You will be prompted before any changes are made. If you agree, the quantity field in your destination spreadsheet will be updated based on the new items in the source spreadsheet.
+
+## If you like candiecoder's solutions...
+DM candiecoder to let them know.
