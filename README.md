@@ -2,7 +2,7 @@
 A barcode scanner fills a spreadsheet but does not maintain an inventory of the items scanned.
 
 # No problem!
-Just use this Excel macro!
+Just use this Excel macro.
 
 ## How it works
 You have two spreadsheets, source and destination. The source spreadsheet collects items scanned with the barcode scanner. The destination spreadsheet contains your inventory. The problem is, you want the new scans to update the inventory.
