@@ -56,23 +56,19 @@ Sub ProcessNewScans()
     'Add weekly column(s) if needed.
     If Sheets(Dst).Cells(DstHdrRow, Asc(DstWeeklyCol) - Asc("A") + 1) <> "" Then
         Dim ThisDate As Date: ThisDate = Now
-        Dim ThisKey As String: ThisKey = Year(ThisDate) & "'" & Right("00" & Month(ThisDate), 2) & "'" & Right("00" & Day(ThisDate), 2)
-        Dim LastKey As String: LastKey = Sheets(Dst).Cells(DstHdrRow, Asc(DstWeeklyCol) - Asc("A") + 1)
-        If Len(LastKey) = 10 Then
-            'If a valid date is there, use it as the beginning date for adding new columns.
-            If Val(Mid(LastKey, 1, 4)) >= 2023 And Mid(LastKey, 5, 1) = "'" And Val(Mid(LastKey, 6, 2)) > 0 And Mid(LastKey, 8, 1) = "'" And Val(Mid(LastKey, 9, 2)) > 0 Then
-                'Convert string date format of "YYYY-MM-DD" to date variable type (so we can do math on it).
-                Dim LastDate As Date: LastDate = DateSerial(Val(Mid(LastKey, 1, 4)), Val(Mid(LastKey, 6, 2)), Val(Mid(LastKey, 9, 2)))
-                'Keep adding columns until we have enough.
-                While LastDate < ThisDate
-                    'Increment to the next week.
-                    LastDate = DateAdd("d", 7, LastDate)
-                    Dim NextKey As String: NextKey = Year(LastDate) & "'" & Right("00" & Month(LastDate), 2) & "'" & Right("00" & Day(LastDate), 2)
-                    Sheets(Dst).Range(DstWeeklyCol & DstHdrRow).EntireColumn.Insert
-                    Sheets(Dst).Cells(DstHdrRow, Asc(DstWeeklyCol) - Asc("A") + 1) = NextKey
-                Wend
-            End If
+        Dim LastDate As Date
+        On Error Resume Next
+        LastDate = Sheets(Dst).Range(DstWeeklyCol & DstHdrRow).Value2
+        If Err.Number = 0 Then
+            'Keep adding columns until we have enough.
+            While LastDate < ThisDate
+                'Increment to the next week.
+                LastDate = DateAdd("d", 7, LastDate)
+                Sheets(Dst).Range(DstWeeklyCol & DstHdrRow).EntireColumn.Insert
+                Sheets(Dst).Range(DstWeeklyCol & DstHdrRow).Value = LastDate
+            Wend
         End If
+        On Error GoTo 0
     End If
     
     'Process the new scans from the source spreadsheet, updating the destination sheet.
