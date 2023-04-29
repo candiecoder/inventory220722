@@ -9,6 +9,7 @@ Sub ProcessNewScans()
     Dim SrcKey As String: SrcKey = "A" 'The column in which the key field appears.
     Dim SrcRow As Integer: SrcRow = 1 'The row at which data begins.
     Dim SrcQtyKey As String: SrcQtyKey = "C" 'The column in which the quantity appears.
+    Dim SrcDateKey As String: SrcDateKey = "D" 'The column in which the date appears.
     Dim SrcFlagKey As String: SrcFlagKey = "Z" 'A free column which can be written to for marking rows that have been processed.
     
     Dim Dst As String: Dst = "Stockroom"
@@ -86,6 +87,31 @@ Sub ProcessNewScans()
                     Sheets(Dst).Cells(J, Asc(DstQtyKey) - Asc("A") + 1) = _
                     Sheets(Dst).Cells(J, Asc(DstQtyKey) - Asc("A") + 1) + _
                     Sheets(Src).Cells(I, Asc(SrcQtyKey) - Asc("A") + 1)
+                    
+                    'Get the date of the transaction.
+                    Dim TxDate As Date
+                    TxDate = Sheets(Src).Range(SrcDateKey & I).Value2
+                    
+                    'Find the correct weekly summary column.
+                    Dim W As Integer
+                    Dim StartDate As Date
+                    For W = 1 To 100
+                        If Sheets(Dst).Cells(DstHdrRow, Asc(DstWeeklyCol) - Asc("A") + W) = "" Then Exit For
+                        On Error Resume Next
+                        StartDate = Sheets(Dst).Cells(DstHdrRow, Asc(DstWeeklyCol) - Asc("A") + W).Value2
+                        If Err.Number = 0 Then
+                            If TxDate >= StartDate Then
+                            
+                                'Update the quantity in the weekly column.
+                                Sheets(Dst).Cells(J, Asc(DstWeeklyCol) - Asc("A") + W) = _
+                                Val(Sheets(Dst).Cells(J, Asc(DstWeeklyCol) - Asc("A") + W)) + _
+                                Sheets(Src).Cells(I, Asc(SrcQtyKey) - Asc("A") + 1)
+                                
+                                Exit For
+                            End If
+                        End If
+                        On Error GoTo 0
+                    Next
                     
                     'Mark the source row as done.
                     Sheets(Src).Cells(I, Asc(SrcFlagKey) - Asc("A") + 1) = "Done"
