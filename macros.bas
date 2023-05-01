@@ -67,6 +67,8 @@ Sub ProcessNewScans()
                 LastDate = DateAdd("d", 7, LastDate)
                 Sheets(Dst).Range(DstWeeklyCol & DstHdrRow).EntireColumn.Insert
                 Sheets(Dst).Range(DstWeeklyCol & DstHdrRow).Value = LastDate
+                Sheets(Dst).Range(DstWeeklyCol & DstHdrRow).EntireColumn.Insert
+                Sheets(Dst).Range(DstWeeklyCol & DstHdrRow).Value = LastDate
             Wend
         End If
         On Error GoTo 0
@@ -95,18 +97,23 @@ Sub ProcessNewScans()
                     'Find the correct weekly summary column.
                     Dim W As Integer
                     Dim StartDate As Date
-                    For W = 1 To 100
-                        If Sheets(Dst).Cells(DstHdrRow, Asc(DstWeeklyCol) - Asc("A") + W) = "" Then Exit For
+                    For W = 0 To 100 Step 2
+                        If Sheets(Dst).Cells(DstHdrRow, Asc(DstWeeklyCol) - Asc("A") + 1 + W) = "" Then Exit For
                         On Error Resume Next
-                        StartDate = Sheets(Dst).Cells(DstHdrRow, Asc(DstWeeklyCol) - Asc("A") + W).Value2
+                        StartDate = Sheets(Dst).Cells(DstHdrRow, Asc(DstWeeklyCol) - Asc("A") + 1 + W).Value2
                         If Err.Number = 0 Then
                             If TxDate >= StartDate Then
                             
                                 'Update the quantity in the weekly column.
-                                Sheets(Dst).Cells(J, Asc(DstWeeklyCol) - Asc("A") + W) = _
-                                Val(Sheets(Dst).Cells(J, Asc(DstWeeklyCol) - Asc("A") + W)) + _
-                                Sheets(Src).Cells(I, Asc(SrcQtyKey) - Asc("A") + 1)
-                                
+                                If Sheets(Src).Cells(I, Asc(SrcQtyKey) - Asc("A") + 1) < 0 Then
+                                    Sheets(Dst).Cells(J, Asc(DstWeeklyCol) - Asc("A") + 1 + W) = _
+                                    Val(Sheets(Dst).Cells(J, Asc(DstWeeklyCol) - Asc("A") + 1 + W)) + _
+                                    Sheets(Src).Cells(I, Asc(SrcQtyKey) - Asc("A") + 1)
+                                Else
+                                    Sheets(Dst).Cells(J, Asc(DstWeeklyCol) - Asc("A") + 2 + W) = _
+                                    Val(Sheets(Dst).Cells(J, Asc(DstWeeklyCol) - Asc("A") + 2 + W)) + _
+                                    Sheets(Src).Cells(I, Asc(SrcQtyKey) - Asc("A") + 1)
+                                End If
                                 Exit For
                             End If
                         End If
