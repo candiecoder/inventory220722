@@ -55,24 +55,40 @@ Sub ProcessNewScans()
     End If
         
     'Add weekly column(s) if needed.
+    Dim Dbg As String
+    Dbg = Dbg & "Add weekly column(s) if needed." & vbCrLf
+    Dbg = Dbg & "DstHdrRow: " & DstHdrRow & ", DstWeeklyCol: " & DstWeeklyCol & ", " & (Asc(DstWeeklyCol) - Asc("A") + 1) & vbCrLf
     If Sheets(Dst).Cells(DstHdrRow, Asc(DstWeeklyCol) - Asc("A") + 1) <> "" Then
         Dim ThisDate As Date: ThisDate = Now
+        Dbg = Dbg & "ThisDate: " & ThisDate & vbCrLf
         Dim LastDate As Date
         On Error Resume Next
-        LastDate = Sheets(Dst).Range(DstWeeklyCol & DstHdrRow).Value2
+        Dbg = Dbg & "Range: " & DstWeeklyCol & DstHdrRow & vbCrLf
+        LastDate = Sheets(Dst).Range(DstWeeklyCol & DstHdrRow).Value
+        If Err.Number <> 0 Then Dbg = Dbg & "Error 1: " & Err.Description & vbCrLf: Err.Clear
         If Err.Number = 0 Then
+            Dbg = Dbg & "LastDate: " & LastDate & vbCrLf
             'Keep adding columns until we have enough.
+            Dbg = Dbg & "LastDate < Thisdate: " & (LastDate < ThisDate) & vbCrLf
             While LastDate < ThisDate
                 'Increment to the next week.
                 LastDate = DateAdd("d", 7, LastDate)
+                If Err.Number <> 0 Then Dbg = Dbg & "Error 2: " & Err.Description & vbCrLf: Err.Clear
+                Dbg = Dbg & "LastDate: " & LastDate & "; " & (LastDate < ThisDate) & vbCrLf
                 Sheets(Dst).Range(DstWeeklyCol & DstHdrRow).EntireColumn.Insert
+                If Err.Number <> 0 Then Dbg = Dbg & "Error 3: " & Err.Description & vbCrLf: Err.Clear
                 Sheets(Dst).Range(DstWeeklyCol & DstHdrRow).Value = LastDate
+                If Err.Number <> 0 Then Dbg = Dbg & "Error 4: " & Err.Description & vbCrLf: Err.Clear
                 Sheets(Dst).Range(DstWeeklyCol & DstHdrRow).EntireColumn.Insert
+                If Err.Number <> 0 Then Dbg = Dbg & "Error 5: " & Err.Description & vbCrLf: Err.Clear
                 Sheets(Dst).Range(DstWeeklyCol & DstHdrRow).Value = LastDate
+                If Err.Number <> 0 Then Dbg = Dbg & "Error 6: " & Err.Description & vbCrLf: Err.Clear
             Wend
+            Dbg = Dbg & "Wend" & vbCrLf
         End If
         On Error GoTo 0
     End If
+    MsgBox Dbg
     
     'Process the new scans from the source spreadsheet, updating the destination sheet.
     I = SrcRow
